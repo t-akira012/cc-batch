@@ -3,7 +3,7 @@ set -euo pipefail
 
 # --- 引数 ---
 URL="$1"
-ENV_FILE="/usr/local/ai_batch/.env"
+ENV_FILE="/app/.env"
 
 # --- 一時ファイル作成 ---
 TMP_INPUT=$(mktemp /tmp/gist_prompt.XXXXXX.txt)

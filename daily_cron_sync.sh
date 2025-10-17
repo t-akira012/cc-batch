@@ -3,7 +3,7 @@ set -euo pipefail
 
 . .env
 
-RUN_SCRIPT="/usr/local/ai_batch/run_gist_batch.sh"
+RUN_SCRIPT="/app/exec_gist_batch.sh"
 GIST_URL=$SYNC_DAILY_CRON_GIST_URL
 
 TMP_LIST=$(mktemp /tmp/batch_list.XXXXXX.txt)

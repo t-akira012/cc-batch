@@ -1,0 +1,12 @@
+services:
+  ai-batch:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai-batch
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - .:/app
+      - ./cron_ai_batch:/etc/cron.d/ai-batch:ro

@@ -18,7 +18,7 @@ for i in {1..5}; do
   OLD_HASH=$(cat "$TMP_HASH" 2>/dev/null || echo "")
   if [ "$NEW_HASH" != "$OLD_HASH" ]; then
     echo "$NEW_HASH" > "$TMP_HASH"
-    /usr/local/ai_batch/exec_gist_prompt.sh "$GIST_URL"
+    /app/exec_gist_batch.sh "$GIST_URL"
   fi
   sleep 10
 done
