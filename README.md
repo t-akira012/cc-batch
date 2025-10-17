@@ -11,13 +11,13 @@
   `.env` の `SYNC_DAILY_CRON_GIST_URL` からバッチ URL リストを取得し、許可された Gist Raw URL だけで 8:00 実行の crontab を再生成。入力検証でシェル注入を遮断。
 
 - `exec_gist_batch.sh`  
-  指定 Gist を取得 → Claude CLI (`claude --print`) で実行 → 1 行目を件名、残りを本文として Resend API に送信。`.env` から送信先などの認証情報を読み込み、一時ファイルを削除します。
+  指定 Gist を取得 → `USE_GEMINI=true` なら Gemini CLI、そうでなければ Claude CLI (`claude --print`) で実行 → 1 行目を件名、残りを本文として Resend API に送信。`.env` から送信先などの認証情報を読み込み、一時ファイルを削除します。
 
 - `.env.template`  
-  Gist URL や Resend API キーなど必要な環境変数の雛形。
+  Gist URL や Resend API キーに加え、`USE_GEMINI`（true で Gemini CLI を使用）と `GEMINI_API_KEY` を含む環境変数の雛形。
 
 - `Dockerfile`  
-  ベースに `ubuntu:24.04` を採用。必要最小限の `curl`, `jq`, `cron`, `ca-certificates`, `tzdata`, `nodejs`, `npm` を導入し、JST へタイムゾーン設定。Claude CLI をグローバルインストールし、`cron -f` をエントリポイントとします。
+  ベースに `ubuntu:24.04` を採用。`curl`, `jq`, `cron`, `ca-certificates`, `tzdata` に加えて NodeSource 経由で Node.js 20 系を導入し、Gemini CLI が必要とする API を提供。CA ストアを `update-ca-certificates` で再構築し、Claude / Gemini CLI をグローバルインストール。JST 設定と `cron -f` をエントリポイントとしています。
 
 - `compose.yaml`  
   `ai-batch` サービスを定義し、ホストのプロジェクト一式を `/app` にバインド。`.env` を読み込み、`unless-stopped` リスタートポリシーで稼働させます。`cron_ai_batch` を `/etc/cron.d/ai-batch` として読み込ませ、コンテナ再ビルドなしでジョブ定義を編集可能です。
@@ -27,7 +27,7 @@
 
 ## 使い方
 
-1. `.env.template` を参考に `.env` を用意し、Gist URL と Resend の認証情報を設定します。
+1. `.env.template` を参考に `.env` を用意し、Gist URL や Resend の認証情報を設定します。`USE_GEMINI` には必ず `true` または `false` を設定し、Gemini を利用する場合は `GEMINI_API_KEY` も指定します。
 2. コンテナイメージをビルドします。
    ```sh
    make build

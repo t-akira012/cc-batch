@@ -1,4 +1,4 @@
-.PHONY: run up down build build-nocache logs restart dev
+.PHONY: run up down build build-nocache logs restart dev dev-root
 
 run: up
 
@@ -23,4 +23,8 @@ restart:
 
 # 開発環境アクセス
 dev:
+	docker compose exec -u appuser ai-batch bash
+
+# rootユーザーでアクセス
+dev-root:
 	docker compose exec ai-batch bash

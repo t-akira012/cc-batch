@@ -9,4 +9,3 @@ services:
       - .env
     volumes:
       - .:/app
-      - ./cron_ai_batch:/etc/cron.d/ai-batch:ro

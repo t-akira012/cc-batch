@@ -1,5 +1,7 @@
 SHELL=/bin/bash
 PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+HOME=/home/appuser
 
-* * * * * root cd /app && ./one_shot.sh
-0 8 * * * root cd /app && ./daily_cron_sync.sh
+# 標準出力/エラー出力をログファイルに記録
+* * * * * appuser cd /app && ./one_shot.sh >> /home/appuser/one_shot.log 2>&1
+0 22 * * * appuser cd /app && ./daily_cron_sync.sh >> /home/appuser/daily_cron.log 2>&1

@@ -1,24 +1,27 @@
 #!/bin/bash
 set -euo pipefail
 
-[[ ! -f .env ]] && echo ".env require" && exit 1
-
 . .env
-GIST_URL=$ONE_SHOT_GIST_URL
+URL=$ONE_SHOT_GIST_URL
 
 # --- 設定 ---
-TMP_TXT="/tmp/oneshot.txt"
-TMP_HASH="/tmp/oneshot.hash"
+TMP_DIR="${HOME}/.tmp"
+mkdir -p "$TMP_DIR"
+TMP_TXT="$TMP_DIR/oneshot.txt"
+TMP_HASH="$TMP_DIR/oneshot.hash"
 
-
-# ハッシュ監視 10秒おき、5回
-for i in {1..5}; do
-  curl -sS "$GIST_URL" -o "$TMP_TXT"
-  NEW_HASH=$(sha256sum "$TMP_TXT" | awk '{print $1}')
-  OLD_HASH=$(cat "$TMP_HASH" 2>/dev/null || echo "")
-  if [ "$NEW_HASH" != "$OLD_HASH" ]; then
-    echo "$NEW_HASH" > "$TMP_HASH"
-    /app/exec_gist_batch.sh "$GIST_URL"
+# --- ハッシュ監視 10秒おき、5回 ---
+for _ in {1..5}; do
+  echo "[one_shot] fetching $URL"
+  curl -sS "${URL}?t=$(date +%s)" -o "$TMP_TXT"
+  HASH=$(sha256sum "$TMP_TXT" | awk '{print $1}')
+  PREV=$(cat "$TMP_HASH" 2>/dev/null || true)
+  if [ "$HASH" != "$PREV" ]; then
+    echo "[one_shot] change detected, executing batch"
+    echo "$HASH" > "$TMP_HASH"
+    /app/exec_gist_batch.sh "$URL"
+  else
+    echo "[one_shot] no change"
   fi
   sleep 10
 done
